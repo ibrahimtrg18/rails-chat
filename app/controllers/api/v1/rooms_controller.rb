@@ -1,4 +1,4 @@
-class Api::V1::RoomsController < ApplicationController
+class Api::V1::RoomsController < Api::V1::SecureController
   include ResponseHelper
 
   # Skip CSRF protection for the create action

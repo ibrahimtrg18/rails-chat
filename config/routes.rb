@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: [:index, :create]
 
-      post '/login', to: 'users#login'
+      post '/users/login', to: 'users#login'
 
       resources :rooms, only: [:index, :create]
     end
