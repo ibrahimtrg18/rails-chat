@@ -13,8 +13,11 @@ Rails.application.routes.draw do
       resources :rooms, only: [:index, :create] do
         member do
           post 'join'
+          get 'messages'
         end
       end
+
+      resources :messages, only: [:create]
     end
   end
 end
