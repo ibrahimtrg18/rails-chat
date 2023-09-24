@@ -7,9 +7,10 @@ class Api::V1::RoomsController < Api::V1::SecureController
 
   # GET /api/v1/rooms
   def index
-    @rooms = Room.all
+    # Fetch all rooms with associated users
+    rooms = Room.includes(:users).all
 
-    json_response(@rooms, "Successfully retrieved #{@rooms.count} rooms", :ok)
+    render json: rooms.to_json(include: :users)
   end
 
   # POST /api/v1/rooms
@@ -30,15 +31,23 @@ class Api::V1::RoomsController < Api::V1::SecureController
 
     unless @room
       json_response(nil, "Room not found", :not_found)
-    end
-
-    if @room.users.include?(@current_user)
-      json_response(nil, "User already joined", :unprocessable_entity)
       return
     end
 
-    @room.users << @current_user
+    @user = User.find_by(id: @current_user.id)
 
+    unless @user
+      json_response(nil, "User not found", :not_found)
+      return
+    end
+
+    # Check if the user is already a member of the room
+    if @room.users.include?(@user)
+      json_response(nil, "User already joined room", :unprocessable_entity)
+      return
+    end
+
+    @room.users << @user
     json_response(nil, "User successfully joined the room", :ok)
   end
 
