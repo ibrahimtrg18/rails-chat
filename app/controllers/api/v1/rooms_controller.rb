@@ -2,7 +2,8 @@ class Api::V1::RoomsController < Api::V1::SecureController
   include ResponseHelper
 
   # Skip CSRF protection for the create action
-  skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :verify_authenticity_token, only: [:create, :join]
+  before_action :authorize_request, only: [:create, :join]
 
   # GET /api/v1/rooms
   def index
@@ -21,6 +22,24 @@ class Api::V1::RoomsController < Api::V1::SecureController
     else
       json_response(nil, "Failed cause of #{@room.errors.full_messages.first}", :unprocessable_entity, @room.errors.full_messages)
     end
+  end
+
+  # POST /api/v1/rooms/:id/join
+  def join
+    @room = Room.find(params[:id])
+
+    unless @room
+      json_response(nil, "Room not found", :not_found)
+    end
+
+    if @room.users.include?(@current_user)
+      json_response(nil, "User already joined", :unprocessable_entity)
+      return
+    end
+
+    @room.users << @current_user
+
+    json_response(nil, "User successfully joined the room", :ok)
   end
 
 

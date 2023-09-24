@@ -10,7 +10,11 @@ Rails.application.routes.draw do
 
       post '/users/login', to: 'users#login'
 
-      resources :rooms, only: [:index, :create]
+      resources :rooms, only: [:index, :create] do
+        member do
+          post 'join'
+        end
+      end
     end
   end
 end

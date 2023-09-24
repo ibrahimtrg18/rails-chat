@@ -1,6 +1,5 @@
 class Api::V1::SecureController < ApplicationController
   include ResponseHelper
-  before_action :authorize_request
 
   private
 
