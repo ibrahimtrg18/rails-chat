@@ -19,7 +19,7 @@ const initialValues = {
 };
 
 function LoginPage() {
-  const { initializeToken } = useAuthContext();
+  const { initialAuthValues } = useAuthContext();
   const [values, setValues] = useState();
   const toast = useToast();
 
@@ -36,7 +36,7 @@ function LoginPage() {
     e.preventDefault();
     try {
       const { data } = await axios.post("/api/v1/users/login", values);
-      initializeToken(data.token);
+      initialAuthValues(data);
       setValues(initialValues);
     } catch (e) {
       toast({

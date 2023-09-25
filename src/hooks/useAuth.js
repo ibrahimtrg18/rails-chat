@@ -7,10 +7,17 @@ import {
 
 export const AUTH_ACTIONS = {
   SET_TOKEN: "SET_TOKEN",
+  INITIAL: "INITIAL",
 };
 
 const authReducer = (state, action) => {
   switch (action.type) {
+    case AUTH_ACTIONS.INITIAL:
+      return {
+        ...state,
+        ...action.payload,
+      };
+
     case AUTH_ACTIONS.SET_TOKEN:
       return {
         ...state,
@@ -24,17 +31,23 @@ const authReducer = (state, action) => {
 };
 
 export const useAuth = () => {
-  const [{ token, isLoggedIn }, dispatch] = React.useReducer(authReducer, {
-    isLoggedIn: false,
-    token: "",
-  });
+  const [{ token, user, isLoggedIn }, dispatch] = React.useReducer(
+    authReducer,
+    {
+      isLoggedIn: false,
+      user: {},
+      token: "",
+    }
+  );
 
-  const initializeToken = (token) => {
-    setLocalStorage(LOCAL_STORAGE_KEYS.TOKEN, token);
+  const initialAuthValues = (payload) => {
+    setLocalStorage(LOCAL_STORAGE_KEYS.TOKEN, payload.token);
+
+    dispatch({ type: AUTH_ACTIONS.INITIAL, payload: payload });
   };
 
   const setToken = (token) => {
-    return dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: token });
+    dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: token });
   };
 
   React.useEffect(() => {
@@ -49,9 +62,10 @@ export const useAuth = () => {
     // state
     token,
     isLoggedIn,
+    user,
 
     // dispatcher
-    initializeToken,
+    initialAuthValues,
     setToken,
   };
 };

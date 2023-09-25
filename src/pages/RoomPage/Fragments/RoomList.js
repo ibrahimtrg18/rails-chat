@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Heading, Grid, GridItem } from "@chakra-ui/react";
 import { useRoomContext } from "../../../contexts/RoomContext";
 import { Link } from "react-router-dom";
+import { axios } from "../../../libs/axios";
 
 export const RoomList = () => {
-  const { rooms } = useRoomContext();
+  const { rooms, initRooms } = useRoomContext();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get(`/api/v1/rooms`);
+
+        initRooms(response.data);
+      } catch (e) {}
+    })();
+  }, []);
 
   return (
     <Box p="4">

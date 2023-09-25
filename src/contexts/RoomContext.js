@@ -3,8 +3,8 @@ import { useRoom } from "../hooks/useRoom";
 
 export const RoomContext = React.createContext();
 
-export const RoomContextProvider = ({ children, roomId }) => {
-  const value = useRoom(roomId);
+export const RoomContextProvider = ({ children }) => {
+  const value = useRoom();
   return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;
 };
 

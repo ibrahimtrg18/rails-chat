@@ -1,72 +1,67 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Input,
-  Text,
-  VStack,
-  useToast,
-} from "@chakra-ui/react";
+import React, { useEffect } from "react";
+import { Box, Flex, Text, VStack } from "@chakra-ui/react";
 import { useRoomContext } from "../../../contexts/RoomContext";
 import { axios } from "../../../libs/axios";
 import { useParams } from "react-router-dom";
+import { useAuthContext } from "../../../contexts/AuthContext";
+import { cable } from "../../../libs/cable";
 
 export const MessageHistory = () => {
-  const [message, setMessage] = useState("");
-  const { messages } = useRoomContext();
+  const { user } = useAuthContext();
+  const { messages, initMessages, addMessage } = useRoomContext();
   const { roomId } = useParams();
-  const toast = useToast();
+  const { token } = useAuthContext();
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/api/v1/messages", {
+  useEffect(() => {
+    cable.subscriptions.create(
+      {
+        channel: "ChatChannel",
         room_id: roomId,
-        content: message,
-      });
-      setMessage("");
-    } catch (e) {
-      toast({
-        position: "top-right",
-        description: e.response.data.message,
-        status: "error",
-        isClosable: true,
-      });
+        token,
+      },
+      {
+        connected: () => {
+          console.log("Connected to ChatChannel");
+        },
+        disconnected: () => {
+          console.log("Disconnected from ChatChannel");
+        },
+        received(data) {
+          // Handle incoming messages
+          addMessage(data);
+        },
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (roomId) {
+      (async () => {
+        const response = await axios.get(`/api/v1/rooms/${roomId}/messages`);
+
+        initMessages(response.data);
+      })();
     }
-  };
+  }, [roomId]);
 
   return (
     <Flex flexDirection="column" gap="2">
       <Box borderWidth="1px" boxShadow="lg">
         <VStack spacing={2} align="start" p="4">
           {messages.map((message) => (
-            <Box flex={1} key={message.id}>
+            <Box
+              flex={1}
+              key={message.id}
+              bg="gray.100"
+              px="4"
+              py="2"
+              borderRadius="xl"
+            >
+              <Text fontSize="xs">{message.user.username}</Text>
               <Text fontSize="md">{message.content}</Text>
             </Box>
           ))}
         </VStack>
-      </Box>
-      <Box
-        position="sticky"
-        bottom="0"
-        bg="white"
-        p="4"
-        boxShadow="0 0 10px 0 rgba(0,0,0,0.12)"
-      >
-        <form onSubmit={onSubmit}>
-          <Flex flexDirection="row" gap="4">
-            <Input
-              type="text"
-              placeholder="Text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <Button colorScheme="blue" type="submit">
-              Send
-            </Button>
-          </Flex>
-        </form>
       </Box>
     </Flex>
   );

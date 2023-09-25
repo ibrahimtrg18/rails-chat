@@ -1,10 +1,8 @@
-import React, { useEffect } from "react";
-import { axios } from "../libs/axios";
-import { cable } from "../libs/cable";
-import { useAuthContext } from "../contexts/AuthContext";
+import React from "react";
 
 export const ROOM_ACTIONS = {
   INITIAL_ROOMS: "INITIAL_ROOMS",
+  INITIAL_ROOM: "INITIAL_ROOM",
   INITIAL_ROOM_MESSAGES: "INITIAL_ROOM_MESSAGES",
   ADD_MESSAGE: "ADD_MESSAGE",
 };
@@ -15,6 +13,12 @@ const roomReducer = (state, action) => {
       return {
         ...state,
         rooms: action.payload,
+      };
+
+    case ROOM_ACTIONS.INITIAL_ROOM:
+      return {
+        ...state,
+        room: action.payload,
       };
 
     case ROOM_ACTIONS.INITIAL_ROOM_MESSAGES:
@@ -36,15 +40,19 @@ const roomReducer = (state, action) => {
   }
 };
 
-export const useRoom = (roomId) => {
-  const [{ rooms, messages }, dispatch] = React.useReducer(roomReducer, {
+export const useRoom = () => {
+  const [{ room, rooms, messages }, dispatch] = React.useReducer(roomReducer, {
+    room: {},
     rooms: [],
     messages: [],
   });
-  const { token } = useAuthContext();
 
   const initRooms = (rooms = []) => {
     return dispatch({ type: ROOM_ACTIONS.INITIAL_ROOMS, payload: rooms });
+  };
+
+  const initRoom = (room = {}) => {
+    return dispatch({ type: ROOM_ACTIONS.INITIAL_ROOM, payload: room });
   };
 
   const initMessages = (messages = []) => {
@@ -58,53 +66,15 @@ export const useRoom = (roomId) => {
     return dispatch({ type: ROOM_ACTIONS.ADD_MESSAGE, payload: message });
   };
 
-  useEffect(() => {
-    cable.subscriptions.create(
-      {
-        channel: "ChatChannel",
-        room_id: roomId,
-        token,
-      },
-      {
-        connected: () => {
-          console.log("Connected to ChatChannel");
-        },
-        disconnected: () => {
-          console.log("Disconnected from ChatChannel");
-        },
-        received(data) {
-          // Handle incoming messages
-          addMessage(data);
-        },
-      }
-    );
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const response = await axios.get(`/api/v1/rooms`);
-
-      initRooms(response.data);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (roomId) {
-      (async () => {
-        const response = await axios.get(`/api/v1/rooms/${roomId}/messages`);
-
-        initMessages(response.data);
-      })();
-    }
-  }, [roomId]);
-
   return {
     // state
+    room,
     rooms,
     messages,
 
     // dispatcher
     initRooms,
+    initRoom,
     initMessages,
     addMessage,
   };

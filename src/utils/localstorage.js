@@ -17,3 +17,11 @@ export const setLocalStorage = (key, value) => {
 
   return localStorage.setItem(key, value);
 };
+
+export const removeLocalStorage = (key) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  return localStorage.removeItem(key);
+};

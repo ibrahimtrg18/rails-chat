@@ -1,13 +1,10 @@
-import { useParams } from "react-router-dom";
 import { RoomContextProvider } from "../../contexts/RoomContext";
-import { MessageHistory } from "./Fragments/MessageHistory";
+import { RoomIdView } from "./Fragments/RoomIdView";
 
 function RoomIdPage() {
-  const { roomId } = useParams();
-
   return (
-    <RoomContextProvider roomId={roomId}>
-      <MessageHistory />
+    <RoomContextProvider>
+      <RoomIdView />
     </RoomContextProvider>
   );
 }
