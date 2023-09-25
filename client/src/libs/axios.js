@@ -7,13 +7,10 @@ import {
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-console.log(getLocalStorage(LOCAL_STORAGE_KEYS.TOKEN));
-
 const axios = Axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Authorization: "Bearer " + getLocalStorage(LOCAL_STORAGE_KEYS.TOKEN),
   },
 });
 
@@ -31,5 +28,13 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+axios.interceptors.request.use((config) => {
+  const token = getLocalStorage(LOCAL_STORAGE_KEYS.TOKEN);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export { axios };
