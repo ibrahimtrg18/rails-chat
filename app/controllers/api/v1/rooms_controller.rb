@@ -10,7 +10,7 @@ class Api::V1::RoomsController < Api::V1::SecureController
     # Fetch all rooms with associated users
     rooms = Room.includes(:users).all
 
-    json_response(rooms.as_json(include: :users), "Successfully retrieved #{rooms.count} messages", :ok)
+    json_response(rooms.as_json(include: :users), "Successfully retrieved #{rooms.count} rooms", :ok)
   end
 
   # POST /api/v1/rooms
@@ -53,8 +53,8 @@ class Api::V1::RoomsController < Api::V1::SecureController
 
   def messages
     room = Room.find(params[:id])
-    messages = room.messages.order(created_at: :asc)
-    json_response(messages, "Successfully retrieved #{messages.count} messages", :ok)
+    messages = room.messages.includes(:user).order(created_at: :asc)
+    json_response(messages.as_json(include: :user), "Successfully retrieved #{messages.count} messages", :ok)
   end
 
   private
