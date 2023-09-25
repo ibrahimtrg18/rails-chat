@@ -4,11 +4,12 @@ import { MessageAction } from "./MessageAction";
 import { Link, useParams } from "react-router-dom";
 import { axios } from "../../../libs/axios";
 import { useRoomContext } from "../../../contexts/RoomContext";
-import { Box, Flex, Heading } from "@chakra-ui/react";
+import { Box, Flex, Heading, useToast } from "@chakra-ui/react";
 
 export const RoomIdView = () => {
   const { roomId } = useParams();
   const { initRoom, room } = useRoomContext();
+  const toast = useToast();
 
   useEffect(() => {
     if (roomId) {
@@ -16,7 +17,14 @@ export const RoomIdView = () => {
         try {
           const { data } = await axios.get(`/api/v1/rooms/${roomId}`);
           initRoom(data);
-        } catch (e) {}
+        } catch (e) {
+          toast({
+            position: "top-right",
+            description: e.response.data.message,
+            status: "error",
+            isClosable: true,
+          });
+        }
       })();
     }
   }, [roomId]);

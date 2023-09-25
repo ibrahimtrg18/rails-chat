@@ -5,6 +5,7 @@ export const ROOM_ACTIONS = {
   INITIAL_ROOM: "INITIAL_ROOM",
   INITIAL_ROOM_MESSAGES: "INITIAL_ROOM_MESSAGES",
   ADD_MESSAGE: "ADD_MESSAGE",
+  ADD_ROOM: "ADD_ROOM",
 };
 
 const roomReducer = (state, action) => {
@@ -19,6 +20,13 @@ const roomReducer = (state, action) => {
       return {
         ...state,
         room: action.payload,
+      };
+
+    case ROOM_ACTIONS.ADD_ROOM:
+      const rooms = [...state.rooms, action.payload];
+      return {
+        ...state,
+        rooms,
       };
 
     case ROOM_ACTIONS.INITIAL_ROOM_MESSAGES:
@@ -62,6 +70,10 @@ export const useRoom = () => {
     });
   };
 
+  const addRoom = (room) => {
+    return dispatch({ type: ROOM_ACTIONS.ADD_ROOM, payload: room });
+  };
+
   const addMessage = (message) => {
     return dispatch({ type: ROOM_ACTIONS.ADD_MESSAGE, payload: message });
   };
@@ -76,6 +88,7 @@ export const useRoom = () => {
     initRooms,
     initRoom,
     initMessages,
+    addRoom,
     addMessage,
   };
 };

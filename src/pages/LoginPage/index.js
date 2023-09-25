@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { axios } from "../../libs/axios";
 import { useAuthContext } from "../../contexts/AuthContext";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   username: "",
