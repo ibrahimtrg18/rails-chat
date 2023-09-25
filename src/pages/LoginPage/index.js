@@ -8,16 +8,20 @@ import {
   Heading,
   Input,
   Stack,
+  useToast,
 } from "@chakra-ui/react";
 import { axios } from "../../libs/axios";
 import { useAuthContext } from "../../contexts/AuthContext";
 
+const initialValues = {
+  username: "",
+  password: "",
+};
+
 function LoginPage() {
   const { initializeToken } = useAuthContext();
-  const [values, setValues] = useState({
-    username: "",
-    password: "",
-  });
+  const [values, setValues] = useState();
+  const toast = useToast();
 
   const onValuesChange = (e) => {
     const { name, value } = e.target;
@@ -33,8 +37,14 @@ function LoginPage() {
     try {
       const { data } = await axios.post("/api/v1/users/login", values);
       initializeToken(data.token);
+      setValues(initialValues);
     } catch (e) {
-      console.log(e);
+      toast({
+        position: "top-right",
+        description: e.response.data.message,
+        status: "error",
+        isClosable: true,
+      });
     }
   };
 
