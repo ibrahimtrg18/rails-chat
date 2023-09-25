@@ -7,7 +7,6 @@ import { useAuthContext } from "../../../contexts/AuthContext";
 import { cable } from "../../../libs/cable";
 
 export const MessageHistory = () => {
-  const { user } = useAuthContext();
   const { messages, initMessages, addMessage } = useRoomContext();
   const { roomId } = useParams();
   const { token } = useAuthContext();
@@ -32,6 +31,10 @@ export const MessageHistory = () => {
         },
       }
     );
+
+    return () => {
+      cable.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -47,21 +50,27 @@ export const MessageHistory = () => {
   return (
     <Flex flexDirection="column" gap="2">
       <Box borderWidth="1px" boxShadow="lg">
-        <VStack spacing={2} align="start" p="4">
-          {messages.map((message) => (
-            <Box
-              flex={1}
-              key={message.id}
-              bg="gray.100"
-              px="4"
-              py="2"
-              borderRadius="xl"
-            >
-              <Text fontSize="xs">{message.user.username}</Text>
-              <Text fontSize="md">{message.content}</Text>
-            </Box>
-          ))}
-        </VStack>
+        {!Boolean(messages.length) ? (
+          <Box px="4" py="2">
+            <Text>There is no messages!</Text>
+          </Box>
+        ) : (
+          <VStack spacing={2} align="start" p="4">
+            {messages.map((message) => (
+              <Box
+                flex={1}
+                key={message.id}
+                bg="gray.100"
+                px="4"
+                py="2"
+                borderRadius="xl"
+              >
+                <Text fontSize="xs">{message.user.username}</Text>
+                <Text fontSize="md">{message.content}</Text>
+              </Box>
+            ))}
+          </VStack>
+        )}
       </Box>
     </Flex>
   );
