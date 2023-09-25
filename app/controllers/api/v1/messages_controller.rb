@@ -20,7 +20,7 @@ class Api::V1::MessagesController < Api::V1::SecureController
     @message.user = @current_user
 
     if @message.save
-      ChatChannel.broadcast_to(@room, message: @message.content, username: @message.user.username)
+      ChatChannel.broadcast_to(@room, @message.as_json(include: :user))
       json_response(@message, "Successfully create message to room #{@room.id}", :created)
     else
       json_response(nil, "Failed cause of #{@message.errors.full_messages.first}", :unprocessable_entity, @message.errors.full_messages)
