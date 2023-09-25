@@ -34,7 +34,7 @@ class Api::V1::UsersController < ApplicationController
       # Generate a JWT token
       token = JwtService.encode(user_id: user.id)
 
-      json_response({ token: token }, "Successfully login", :ok)
+      json_response({ token: token, user: user }, "Successfully login", :ok)
     else
       json_response(nil, "Invalid username and password", :unauthorized)
     end
