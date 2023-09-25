@@ -62,7 +62,7 @@ function RegisterPage() {
       w="100vw"
       h="100vh"
     >
-      <Heading>Login</Heading>
+      <Heading>Register</Heading>
       <Box
         minW="md"
         maxW="md"
