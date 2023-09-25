@@ -8,20 +8,18 @@ import {
   Heading,
   Input,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { axios } from "../../libs/axios";
-import { useAuthContext } from "../../contexts/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
+  email: "",
   username: "",
   password: "",
 };
 
-function LoginPage() {
-  const { initialAuthValues } = useAuthContext();
+function RegisterPage() {
   const [values, setValues] = useState(initialValues);
   const toast = useToast();
   const navigate = useNavigate();
@@ -38,10 +36,14 @@ function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("/api/v1/users/login", values);
-      initialAuthValues(data);
-      setValues(initialValues);
-      navigate("/rooms");
+      const { message } = await axios.post("/api/v1/users", { user: values });
+      navigate("/");
+      toast({
+        position: "top-right",
+        description: message,
+        status: "error",
+        isClosable: true,
+      });
     } catch (e) {
       toast({
         position: "top-right",
@@ -72,6 +74,17 @@ function LoginPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={4}>
+            <FormControl id="email" isRequired>
+              <FormLabel>Email address</FormLabel>
+              <Input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={values.email}
+                onChange={onValuesChange}
+              />
+            </FormControl>
+
             <FormControl id="username" isRequired>
               <FormLabel>Username</FormLabel>
               <Input
@@ -94,12 +107,6 @@ function LoginPage() {
               />
             </FormControl>
 
-            <Link to="/register">
-              <Text fontSize="sm" _hover={{ textDecoration: "underline" }}>
-                Don't have account?
-              </Text>
-            </Link>
-
             <Button type="submit" colorScheme="blue">
               Sign In
             </Button>
@@ -110,4 +117,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;
