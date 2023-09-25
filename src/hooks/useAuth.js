@@ -1,5 +1,9 @@
 import React from "react";
-import { LOCAL_STORAGE_KEYS, getLocalStorage } from "../utils/localstorage";
+import {
+  LOCAL_STORAGE_KEYS,
+  getLocalStorage,
+  setLocalStorage,
+} from "../utils/localstorage";
 
 export const AUTH_ACTIONS = {
   SET_TOKEN: "SET_TOKEN",
@@ -25,6 +29,10 @@ export const useAuth = () => {
     token: "",
   });
 
+  const initializeToken = (token) => {
+    setLocalStorage(LOCAL_STORAGE_KEYS.TOKEN, token);
+  };
+
   const setToken = (token) => {
     return dispatch({ type: AUTH_ACTIONS.SET_TOKEN, payload: token });
   };
@@ -43,6 +51,7 @@ export const useAuth = () => {
     isLoggedIn,
 
     // dispatcher
+    initializeToken,
     setToken,
   };
 };

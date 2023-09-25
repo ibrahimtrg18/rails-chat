@@ -15,5 +15,5 @@ export const setLocalStorage = (key, value) => {
     return;
   }
 
-  return localStorage.setItem(key);
+  return localStorage.setItem(key, value);
 };
