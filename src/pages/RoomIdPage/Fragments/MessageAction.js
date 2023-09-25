@@ -8,7 +8,7 @@ import { axios } from "../../../libs/axios";
 export const MessageAction = () => {
   const [message, setMessage] = useState("");
   const { user } = useAuthContext();
-  const { room } = useRoomContext();
+  const { room, initRoom } = useRoomContext();
   const { roomId } = useParams();
   const toast = useToast();
 
@@ -30,6 +30,14 @@ export const MessageAction = () => {
     }
   };
 
+  const onJoin = async () => {
+    try {
+      await axios.post(`/api/v1/rooms/${roomId}/join`);
+      const { data } = await axios.get(`/api/v1/rooms/${roomId}`);
+      initRoom(data);
+    } catch (e) {}
+  };
+
   const isUserJoined = room?.users?.some((_user) => _user.id === user.id);
 
   if (!isUserJoined) {
@@ -41,7 +49,7 @@ export const MessageAction = () => {
         p="4"
         boxShadow="0 0 10px 0 rgba(0,0,0,0.12)"
       >
-        <Button colorScheme="blue" w="full">
+        <Button colorScheme="blue" w="full" onClick={onJoin}>
           Join
         </Button>
       </Box>

@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { axios } from "../../libs/axios";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { redirect, useNavigate } from "react-router-dom";
 
 const initialValues = {
   username: "",
@@ -20,8 +21,9 @@ const initialValues = {
 
 function LoginPage() {
   const { initialAuthValues } = useAuthContext();
-  const [values, setValues] = useState();
+  const [values, setValues] = useState(initialValues);
   const toast = useToast();
+  const navigate = useNavigate();
 
   const onValuesChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +40,7 @@ function LoginPage() {
       const { data } = await axios.post("/api/v1/users/login", values);
       initialAuthValues(data);
       setValues(initialValues);
+      navigate("/rooms");
     } catch (e) {
       toast({
         position: "top-right",
@@ -74,6 +77,7 @@ function LoginPage() {
                 type="text"
                 name="username"
                 placeholder="Username"
+                value={values.username}
                 onChange={onValuesChange}
               />
             </FormControl>
@@ -84,6 +88,7 @@ function LoginPage() {
                 type="password"
                 name="password"
                 placeholder="Password"
+                value={values.password}
                 onChange={onValuesChange}
               />
             </FormControl>
