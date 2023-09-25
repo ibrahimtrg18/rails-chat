@@ -1,46 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Box, Button, Flex, Input, Text, VStack } from "@chakra-ui/react";
-import { cable } from "../../../libs/cable";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Text,
+  VStack,
+  useToast,
+} from "@chakra-ui/react";
 import { useRoomContext } from "../../../contexts/RoomContext";
-import { useAuthContext } from "../../../contexts/AuthContext";
+import { axios } from "../../../libs/axios";
+import { useParams } from "react-router-dom";
 
 export const MessageHistory = () => {
   const [message, setMessage] = useState("");
   const { messages } = useRoomContext();
-  const { token } = useAuthContext();
   const { roomId } = useParams();
+  const toast = useToast();
 
-  const chatChannel = cable;
-
-  useEffect(() => {
-    chatChannel.subscriptions.create(
-      {
-        channel: "ChatChannel",
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("/api/v1/messages", {
         room_id: roomId,
-        token,
-      },
-      {
-        connected: () => {
-          console.log("Connected to ChatChannel");
-        },
-        disconnected: () => {
-          console.log("Disconnected from ChatChannel");
-        },
-        received(data) {
-          // Handle incoming messages
-        },
-      }
-    );
-
-    return () => {
-      chatChannel.disconnect();
-    };
-  }, [chatChannel, messages]);
-
-  const handleSendMessage = () => {
-    chatChannel.send({ message });
-    setMessage("");
+        content: message,
+      });
+      setMessage("");
+    } catch (e) {
+      toast({
+        position: "top-right",
+        description: e.response.data.message,
+        status: "error",
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -54,25 +47,27 @@ export const MessageHistory = () => {
           ))}
         </VStack>
       </Box>
-      <Flex
+      <Box
         position="sticky"
         bottom="0"
-        flexDirection="row"
-        gap="4"
         bg="white"
         p="4"
         boxShadow="0 0 10px 0 rgba(0,0,0,0.12)"
       >
-        <Input
-          type="text"
-          placeholder="Text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <Button colorScheme="blue" onClick={handleSendMessage}>
-          Send
-        </Button>
-      </Flex>
+        <form onSubmit={onSubmit}>
+          <Flex flexDirection="row" gap="4">
+            <Input
+              type="text"
+              placeholder="Text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <Button colorScheme="blue" type="submit">
+              Send
+            </Button>
+          </Flex>
+        </form>
+      </Box>
     </Flex>
   );
 };

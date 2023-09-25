@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { axios } from "../libs/axios";
+import { cable } from "../libs/cable";
+import { useAuthContext } from "../contexts/AuthContext";
 
 export const ROOM_ACTIONS = {
   INITIAL_ROOMS: "INITIAL_ROOMS",
@@ -22,8 +24,11 @@ const roomReducer = (state, action) => {
       };
 
     case ROOM_ACTIONS.ADD_MESSAGE:
+      const messages = [...state.messages, action.payload];
+
       return {
         ...state,
+        messages,
       };
 
     default:
@@ -36,6 +41,7 @@ export const useRoom = (roomId) => {
     rooms: [],
     messages: [],
   });
+  const { token } = useAuthContext();
 
   const initRooms = (rooms = []) => {
     return dispatch({ type: ROOM_ACTIONS.INITIAL_ROOMS, payload: rooms });
@@ -48,7 +54,33 @@ export const useRoom = (roomId) => {
     });
   };
 
-  React.useEffect(() => {
+  const addMessage = (message) => {
+    return dispatch({ type: ROOM_ACTIONS.ADD_MESSAGE, payload: message });
+  };
+
+  useEffect(() => {
+    cable.subscriptions.create(
+      {
+        channel: "ChatChannel",
+        room_id: roomId,
+        token,
+      },
+      {
+        connected: () => {
+          console.log("Connected to ChatChannel");
+        },
+        disconnected: () => {
+          console.log("Disconnected from ChatChannel");
+        },
+        received(data) {
+          // Handle incoming messages
+          addMessage(data);
+        },
+      }
+    );
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const response = await axios.get(`/api/v1/rooms`);
 
@@ -56,7 +88,7 @@ export const useRoom = (roomId) => {
     })();
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (roomId) {
       (async () => {
         const response = await axios.get(`/api/v1/rooms/${roomId}/messages`);
@@ -66,7 +98,6 @@ export const useRoom = (roomId) => {
     }
   }, [roomId]);
 
-  console.log("messages", messages);
   return {
     // state
     rooms,
@@ -75,5 +106,6 @@ export const useRoom = (roomId) => {
     // dispatcher
     initRooms,
     initMessages,
+    addMessage,
   };
 };
