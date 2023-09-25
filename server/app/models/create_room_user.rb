@@ -1,2 +1,0 @@
-class CreateRoomUser < ApplicationRecord
-end
