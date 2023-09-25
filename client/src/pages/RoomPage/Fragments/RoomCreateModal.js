@@ -16,18 +16,22 @@ import { useRoomContext } from "../../../contexts/RoomContext";
 const initialName = "";
 
 export const RoomCreateModal = (props) => {
+  const { onClose } = props;
   const [name, setName] = useState(initialName);
   const { addRoom } = useRoomContext();
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const { data } = await axios.post("/api/v1/rooms", {
         name,
       });
 
       addRoom(data);
+      onClose();
     } catch (e) {
       toast({
         position: "top-right",
@@ -36,6 +40,7 @@ export const RoomCreateModal = (props) => {
         isClosable: true,
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -55,7 +60,7 @@ export const RoomCreateModal = (props) => {
               />
             </FormControl>
 
-            <Button type="submit" colorScheme="blue">
+            <Button type="submit" colorScheme="blue" isLoading={isLoading}>
               Create
             </Button>
           </Stack>

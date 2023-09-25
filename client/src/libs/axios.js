@@ -7,6 +7,8 @@ import {
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
+console.log(getLocalStorage(LOCAL_STORAGE_KEYS.TOKEN));
+
 const axios = Axios.create({
   baseURL: BASE_URL,
   headers: {

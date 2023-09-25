@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MessageHistory } from "./MessageHistory";
 import { MessageAction } from "./MessageAction";
 import { Link, useParams } from "react-router-dom";
@@ -9,11 +9,13 @@ import { Box, Flex, Heading, useToast } from "@chakra-ui/react";
 export const RoomIdView = () => {
   const { roomId } = useParams();
   const { initRoom, room } = useRoomContext();
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     if (roomId) {
       (async () => {
+        setIsLoading(true);
         try {
           const { data } = await axios.get(`/api/v1/rooms/${roomId}`);
           initRoom(data);
@@ -25,6 +27,7 @@ export const RoomIdView = () => {
             isClosable: true,
           });
         }
+        setIsLoading(false);
       })();
     }
   }, [roomId]);
@@ -39,7 +42,7 @@ export const RoomIdView = () => {
       </Box>
       <Flex flexDirection="column" justifyContent="space-between" minH="100vh">
         <MessageHistory />
-        <MessageAction />
+        {!isLoading && <MessageAction />}
       </Flex>
     </Box>
   );

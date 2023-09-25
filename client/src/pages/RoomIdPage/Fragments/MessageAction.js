@@ -11,9 +11,11 @@ export const MessageAction = () => {
   const { room, initRoom } = useRoomContext();
   const { roomId } = useParams();
   const toast = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await axios.post("/api/v1/messages", {
         room_id: roomId,
@@ -28,6 +30,7 @@ export const MessageAction = () => {
         isClosable: true,
       });
     }
+    setIsLoading(false);
   };
 
   const onJoin = async () => {
@@ -72,7 +75,7 @@ export const MessageAction = () => {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <Button colorScheme="blue" type="submit">
+          <Button colorScheme="blue" type="submit" isLoading={isLoading}>
             Send
           </Button>
         </Flex>

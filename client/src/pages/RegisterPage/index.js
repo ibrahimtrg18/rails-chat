@@ -23,6 +23,7 @@ function RegisterPage() {
   const [values, setValues] = useState(initialValues);
   const toast = useToast();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onValuesChange = (e) => {
     const { name, value } = e.target;
@@ -35,6 +36,7 @@ function RegisterPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const { message } = await axios.post("/api/v1/users", { user: values });
       navigate("/");
@@ -52,6 +54,7 @@ function RegisterPage() {
         isClosable: true,
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -107,7 +110,7 @@ function RegisterPage() {
               />
             </FormControl>
 
-            <Button type="submit" colorScheme="blue">
+            <Button type="submit" colorScheme="blue" isLoading={isLoading}>
               Sign In
             </Button>
           </Stack>

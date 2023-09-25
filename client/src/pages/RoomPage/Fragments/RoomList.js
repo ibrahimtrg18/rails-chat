@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Heading,
@@ -20,10 +20,12 @@ export const RoomList = () => {
   const { user } = useAuthContext();
   const { rooms, initRooms } = useRoomContext();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
     (async () => {
+      setIsLoading(true);
       try {
         const response = await axios.get(`/api/v1/rooms`);
 
@@ -36,6 +38,7 @@ export const RoomList = () => {
           isClosable: true,
         });
       }
+      setIsLoading(false);
     })();
   }, []);
 
@@ -50,8 +53,8 @@ export const RoomList = () => {
       </Flex>
       <Grid gap="4" templateColumns="repeat(3, 1fr)">
         {rooms.map((room) => {
-          const usersCount = room.users.length;
-          const isJoined = room.users.some((_user) => _user.id === user.id);
+          const usersCount = room.users?.length;
+          const isJoined = room.users?.some((_user) => _user.id === user.id);
 
           return (
             <Link to={`/rooms/${room.id}`}>

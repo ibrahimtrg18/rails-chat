@@ -23,6 +23,7 @@ const initialValues = {
 function LoginPage() {
   const { initialAuthValues } = useAuthContext();
   const [values, setValues] = useState(initialValues);
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ function LoginPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const { data } = await axios.post("/api/v1/users/login", values);
       initialAuthValues(data);
@@ -50,6 +52,7 @@ function LoginPage() {
         isClosable: true,
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -100,7 +103,7 @@ function LoginPage() {
               </Text>
             </Link>
 
-            <Button type="submit" colorScheme="blue">
+            <Button type="submit" colorScheme="blue" isLoading={isLoading}>
               Sign In
             </Button>
           </Stack>
