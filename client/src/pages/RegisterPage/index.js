@@ -41,7 +41,7 @@ function RegisterPage() {
       toast({
         position: "top-right",
         description: message,
-        status: "error",
+        status: "success",
         isClosable: true,
       });
     } catch (e) {
