@@ -8,7 +8,7 @@ class Api::V1::UsersController < ApplicationController
   # GET /api/v1/users
   def index
     @users = User.all
-    json_response(@users, "Successfully retrieved #{@users.count} rooms")
+    json_response(@users, "Successfully retrieved #{@users.count} users")
   end
 
   # POST /api/v1/users
@@ -19,7 +19,7 @@ class Api::V1::UsersController < ApplicationController
 
     # Create user in the database
     if @user.save
-      response_data = @user.as_json(except: [:password, :password_digest])
+      response_data = @user.as_json(only: [:id, :username, :email])
       json_response(response_data, 'Succesfully create a new user', nil, :created)
     else
       json_response(nil, "Failed cause of #{@user.errors.full_messages.first}", :unprocessable_entity, @user.errors.full_messages)
@@ -50,7 +50,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:email, :username, :password, :password_confirmation)
+    params.require(:user).permit(:username, :email, :password)
   end
 
   def login_params
