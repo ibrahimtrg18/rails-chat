@@ -13,6 +13,14 @@ class Api::V1::RoomsController < Api::V1::SecureController
     json_response(rooms.as_json(include: :users), "Successfully retrieved #{rooms.count} rooms", :ok)
   end
 
+  # GET /api/v1/rooms/:id
+  # Show a room detail
+  def show
+    room = Room.includes(:users).find(params[:id])
+
+    json_response(room.as_json(include: :users), "Successfully retrieved a room #{room.id}", :ok)
+  end
+
   # POST /api/v1/rooms
   # Create a new room with the given name
   def create

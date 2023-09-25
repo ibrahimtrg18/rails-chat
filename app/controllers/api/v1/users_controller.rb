@@ -2,7 +2,8 @@ class Api::V1::UsersController < ApplicationController
   include ResponseHelper
 
   # Skip CSRF protection for the create action
-  skip_before_action :verify_authenticity_token, only: [:create, :login]
+  skip_before_action :verify_authenticity_token, only: [:create, :login, :token]
+  before_action :authorize_request, only: [:token]
 
   # GET /api/v1/users
   def index
@@ -40,6 +41,12 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def token
+    token = JwtService.encode(user_id: @current_user['id'])
+
+    json_response({token: token, user: @current_user}, "Successfully authorization", :ok)
+  end
+
   private
 
   def user_params
@@ -48,5 +55,22 @@ class Api::V1::UsersController < ApplicationController
 
   def login_params
     params.require(:user).permit(:username, :password)
+  end
+
+  def authorize_request
+    header = request.headers['Authorization']
+    token = header&.split(' ')&.last
+
+    begin
+      # Verify and decode the token
+      decoded_token = JwtService.decode(token)
+
+      # Fetch the user or relevant data from the token
+      @current_user = User.find(decoded_token['user_id'])
+    rescue JWT::DecodeError
+      json_response(nil, "Unauthorized", :unauthorized)
+    rescue ActiveRecord::RecordNotFound
+      json_response(nil, "User not found", :not_found)
+    end
   end
 end

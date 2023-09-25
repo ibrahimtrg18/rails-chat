@@ -7,10 +7,10 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users, only: [:index, :create]
-
       post '/users/login', to: 'users#login'
+      post '/users/token', to: 'users#token'
 
-      resources :rooms, only: [:index, :create] do
+      resources :rooms, only: [:index, :show, :create] do
         member do
           post 'join'
           get 'messages'
