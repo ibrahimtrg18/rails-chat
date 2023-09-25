@@ -5,9 +5,9 @@ email: ibrahimtarigan@gmail.com
 
 Stacks:
 
-Client: React.js, Chakra-ui, Axios, @rails/actioncable
+Client: React.js, Chakra-ui, Axios, Websocket
 
-Server: Ruby on Rails, sqlite3
+Server: Ruby on Rails, sqlite3, Websocket
 
 Deployment Live Project
 
