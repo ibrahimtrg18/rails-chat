@@ -12,6 +12,7 @@ export const MessageAction = () => {
   const { roomId } = useParams();
   const toast = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isJoinLoading, setIsJoinLoading] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -34,11 +35,13 @@ export const MessageAction = () => {
   };
 
   const onJoin = async () => {
+    setIsJoinLoading(true);
     try {
       await axios.post(`/api/v1/rooms/${roomId}/join`);
       const { data } = await axios.get(`/api/v1/rooms/${roomId}`);
       initRoom(data);
     } catch (e) {}
+    setIsJoinLoading(false);
   };
 
   const isUserJoined = room?.users?.some((_user) => _user.id === user.id);
@@ -52,7 +55,12 @@ export const MessageAction = () => {
         p="4"
         boxShadow="0 0 10px 0 rgba(0,0,0,0.12)"
       >
-        <Button colorScheme="blue" w="full" onClick={onJoin}>
+        <Button
+          colorScheme="blue"
+          w="full"
+          onClick={onJoin}
+          isLoading={isJoinLoading}
+        >
           Join
         </Button>
       </Box>
