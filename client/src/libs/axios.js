@@ -5,8 +5,10 @@ import {
   removeLocalStorage,
 } from "../utils/localstorage";
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 const axios = Axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
     Authorization: "Bearer " + getLocalStorage(LOCAL_STORAGE_KEYS.TOKEN),
